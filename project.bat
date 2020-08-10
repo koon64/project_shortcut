@@ -27,9 +27,11 @@ if "%project_name%"=="." (
 :: use powershell to capitalize the first letter of each word of a string
 for /f "delims=" %%a in (' powershell "echo (Get-Culture).TextInfo.ToTitleCase('%project_name%'.replace('_', ' '))" ') do set "display_name=%%a"
 
-:: create the readme
-echo # %display_name% > README.md
-echo #### By %GITHUB_USERNAME% >> README.md
+:: create the readme if not exist
+if not exist README.md (
+    echo # %display_name% > README.md
+    echo #### By %GITHUB_USERNAME% >> README.md
+)
 
 :: initialize the git repo
 git init
