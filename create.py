@@ -112,14 +112,14 @@ def create(directory, public=False, description="", license="MIT"):
         _type=license,
         author=author
     )
-    exit()
+    
     initialize_repo(
         repo_name=directory,
         description=description,
         public=public
     )
 
-    # open_editor()
+    open_editor()
 
 if __name__ == "__main__":
     cmd_args = sys.argv
