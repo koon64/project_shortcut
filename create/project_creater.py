@@ -1,14 +1,13 @@
-from dotenv import load_dotenv
 import os
 from datetime import datetime
 from github import Github
 from . import LicenseGenerator as lg
-
-# load the dotenv
-load_dotenv()
+from yaml import load, FullLoader
 
 
 class ProjectCreater:
+
+    CONFIG_FILE_NAME = "config.yml"
 
     # used for defining an undefined arg state
     class Undefined:
@@ -16,6 +15,17 @@ class ProjectCreater:
 
     def __init__(self, *projects):
         self.projects = projects
+
+    @classmethod
+    def get_config(cls):
+        try:
+            with open(cls.CONFIG_FILE_NAME) as file:
+                config = load(file, Loader=FullLoader)
+                file.close()
+                return config
+        except Exception as e:
+            print(e)
+            return None
 
     def prompt_for_args(self, args: dict, defaults: dict) -> dict:
         """Prompt the user for fill in Undefined arguments
@@ -40,11 +50,14 @@ class ProjectCreater:
             # set to default if not given
             if value == "":
                 value = default
+            # change a yes or no string to a bool
+            if default.lower() in ["yes", "no"]:
+                value = value.lower() in ["yes", "y"]
             args[key] = value
         return args
 
     def get_non_project_specific_args(self,):
-        return {"description": "My project", "public": False, "license": "MIT"}
+        return {"description": "My project", "public": "no", "license": "MIT"}
 
     def create_directory(self, directory):
         if os.path.exists(directory):
@@ -85,26 +98,32 @@ class ProjectCreater:
         display_name = " ".join(
             [word[0].upper() + word[1:].lower() for word in project_name.split("_")]
         )
+        # load the config
+        config = self.get_config()
+        if not config:
+            print("ERR: Could not load the config")
+            exit(1)
         # combine all the args into 1
         # now timestamp
         now = datetime.now()
         # github profile
         # access token
-        github_access_token = os.environ.get("GITHUB_ACCESS_TOKEN")
+        github_access_token = config.get("github_access_token")
         github = Github(github_access_token)
         github_user = github.get_user()
         return {
-            "directory": directory,
-            "project_name": project_name,
-            "display_name": display_name,
-            "class_name": display_name.replace(" ", ""),
-            "github_access_token": github_access_token,
-            "author": os.environ.get("AUTHOR"),
-            "github": github,
-            "github_user": github_user,
-            "repo_name": f"{github_user.login}/{project_name}",
-            "year": now.year,
-            "month": now.month,
+            **{
+                "directory": directory,
+                "project_name": project_name,
+                "display_name": display_name,
+                "class_name": display_name.replace(" ", ""),
+                "github": github,
+                "github_user": github_user,
+                "repo_name": f"{github_user.login}/{project_name}",
+                "year": now.year,
+                "month": now.month,
+            },
+            **config,
         }
 
     def get_args(self, directory: dict, args: dict, project) -> dict:
@@ -154,4 +173,4 @@ class ProjectCreater:
         # run the closure commands
         # project->parent
 
-        project.run_closure_commands(**kwargs)
+        # project.run_closure_commands(**kwargs)

@@ -124,7 +124,58 @@ class Project:
         ]
 
     @classmethod
+    def get_github_templates(cls, **kwargs):
+        return {
+            "SECURITY": "base/SECURITY.md",
+            "PULL_REQUEST_TEMPLATE": "base/PULL_REQUEST_TEMPLATE",
+            "CODE_OF_CONDUCT": "base/CODE_OF_CONDUCT",
+            "ISSUE_TEMPLATE/BUG.md"
+        }
+
+    @classmethod
+    def create_github_templates(cls, **kwargs):
+        if not kwargs.get("public"):
+            return
+        templates = cls.get_github_templates(**kwargs)
+        for name, template in templates.items():
+            file_name = f"{name}.md"
+            cls.create_file_from_template(
+                template=template, file_name=file_name, **kwargs
+            )
+        return True
+
+    @classmethod
+    def create_github_workflows(cls, **kwargs):
+        # TODO: implement this
+        pass
+
+    @classmethod
+    def create_github_files(cls, **kwargs):
+        # try to create the github folder
+        if not os.path.exists(".github/"):
+            os.mkdir(".github")
+        # change into the .github folder
+        os.chdir(".github")
+        # create the github templates
+        cls.create_github_templates(**kwargs)
+        # create the workflows directory
+        if not os.path.exists("workflows/"):
+            os.mkdir("workflows")
+        # change into the workflows dir
+        os.chdir("workflows")
+        # create the workflow
+        cls.create_github_workflows(**kwargs)
+        # exit the workflows dir
+        os.chdir("..")
+        # exit the .github dir
+        os.chdir("..")
+
+    @classmethod
     def run_init_commands(cls, **kwargs):
+
+        # create the github files
+        cls.create_github_files(**kwargs)
+
         # TODO: refactor this into the repo_generator??
         pass
 
