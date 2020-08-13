@@ -1,7 +1,4 @@
-from create import (
-    ProjectCreater,
-    Project
-)
+from create import ProjectCreater, Project
 
 
 class ProjectCreaterMock(ProjectCreater):
