@@ -1,31 +1,24 @@
 from dotenv import load_dotenv
 import os
 from datetime import datetime
-from . import (
-    LicenseGenerator as lg,
-)
+from github import Github
+from . import LicenseGenerator as lg
+
 # load the dotenv
 load_dotenv()
 
 
 class ProjectCreater:
-    
+
     # used for defining an undefined arg state
     class Undefined:
         pass
 
-    def __init__(
-        self,
-        *projects
-    ):
+    def __init__(self, *projects):
         self.projects = projects
-    
-    def prompt_for_args(
-            self,
-            args: dict,
-            defaults: dict
-        ) -> dict:
-        '''Prompt the user for fill in Undefined arguments
+
+    def prompt_for_args(self, args: dict, defaults: dict) -> dict:
+        """Prompt the user for fill in Undefined arguments
         
         Arguments
         ---------
@@ -36,28 +29,22 @@ class ProjectCreater:
         -------
             dict: Filled in arguments
         
-        '''
+        """
         for key, val in args.items():
             if val is not self.Undefined:
                 continue
             if key not in defaults:
-                raise Exception('default not given')
+                raise Exception("default not given")
             default = defaults.get(key)
-            value = input(f'{key} ({default}): ')
+            value = input(f"{key} ({default}): ")
             # set to default if not given
-            if value == '':
+            if value == "":
                 value = default
             args[key] = value
         return args
 
-    def get_non_project_specific_args(
-        self,
-    ):
-        return {
-            'description': 'My project',
-            'public': False,
-            'license': 'MIT'
-        }
+    def get_non_project_specific_args(self,):
+        return {"description": "My project", "public": False, "license": "MIT"}
 
     def create_directory(self, directory):
         if os.path.exists(directory):
@@ -71,31 +58,19 @@ class ProjectCreater:
         os.chdir(directory)
         return True
 
-    def create_non_project_specific_files(
-        self,
-        **kwargs
-    ):
+    def create_non_project_specific_files(self, **kwargs):
         # name the args
-        directory = kwargs.get('directory')
+        directory = kwargs.get("directory")
         # create the directory
-        created = self.create_directory(
-            directory
-        )
+        created = self.create_directory(directory)
         if created:
             print(f'Created the directory "{directory}"')
-        self.enter_directory(
-            directory
-        )
+        self.enter_directory(directory)
 
         # create the license from the license generator
-        ok = lg.create(
-            **kwargs
-        )
+        ok = lg.create(**kwargs)
         if not ok:
             return
-
-        
-        
 
     def get_project(self, _type: str):
         return next(filter(lambda proj: proj.TYPE == _type, self.projects), None)
@@ -107,19 +82,29 @@ class ProjectCreater:
         if project_name == ".":
             project_name = os.getcwd().split("\\").pop()
         # define the display name
-        display_name = " ".join([word[0].upper()+word[1:].lower() for word in project_name.split("_")])
+        display_name = " ".join(
+            [word[0].upper() + word[1:].lower() for word in project_name.split("_")]
+        )
         # combine all the args into 1
         # now timestamp
         now = datetime.now()
+        # github profile
+        # access token
+        github_access_token = os.environ.get("GITHUB_ACCESS_TOKEN")
+        github = Github(github_access_token)
+        github_user = github.get_user()
         return {
-            'directory': directory,
-            'project_name': project_name,
-            'display_name': display_name,
-            'class_name': display_name.replace(' ', ''),
-            'github_access_token': os.environ.get('GITHUB_ACCESS_TOKEN'),
-            'author': os.environ.get('AUTHOR'),
-            'year': now.year,
-            'month': now.month
+            "directory": directory,
+            "project_name": project_name,
+            "display_name": display_name,
+            "class_name": display_name.replace(" ", ""),
+            "github_access_token": github_access_token,
+            "author": os.environ.get("AUTHOR"),
+            "github": github,
+            "github_user": github_user,
+            "repo_name": f"{github_user.login}/{project_name}",
+            "year": now.year,
+            "month": now.month,
         }
 
     def get_args(self, directory: dict, args: dict, project) -> dict:
@@ -131,59 +116,42 @@ class ProjectCreater:
             **required_project_specific_args,
         }
         # convert a list of args to a dict of kwargs
-        kwargs = {key: (args[i] if i < len(args) else self.Undefined) for i, key in enumerate(required_args.keys())}
+        kwargs = {
+            key: (args[i] if i < len(args) else self.Undefined)
+            for i, key in enumerate(required_args.keys())
+        }
 
         # prompt the user for required args
         args = {
-            **self.prompt_for_args(
-                args=kwargs,
-                defaults=required_args
-            ), 
-            **self.get_global_args(directory)
+            **self.prompt_for_args(args=kwargs, defaults=required_args),
+            **self.get_global_args(directory),
         }
         return args
 
     def create(
-        self,
-        directory,
-        _type="base",
-        args=[],
+        self, directory, _type="base", args=[],
     ):
         # get the project from the type
         project = self.get_project(_type)
         # test if the project exists
         if not project:
-            print(f'{_type} was not a valid project')
+            print(f"{_type} was not a valid project")
             exit(1)
         # get the args
-        kwargs = self.get_args(
-            directory=directory,
-            args=args,
-            project=project
-        )
+        kwargs = self.get_args(directory=directory, args=args, project=project)
 
         # create all non-project-specific files
-        self.create_non_project_specific_files(
-            **kwargs
-        )
-
+        self.create_non_project_specific_files(**kwargs)
 
         # create all project-specific files
-        project.create_files(
-            **kwargs
-        )
+        project.create_files(**kwargs)
 
         # run the init commands
         # parent->project
 
-        project.run_init_commands(
-            **kwargs
-        )
+        project.run_init_commands(**kwargs)
 
         # run the closure commands
         # project->parent
 
-        project.run_closure_commands(
-            **kwargs
-        )
-
+        project.run_closure_commands(**kwargs)

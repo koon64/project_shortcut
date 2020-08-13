@@ -17,14 +17,6 @@ if __name__ == "__main__":
 
     given_args = cmd_args[3:]
 
-    project_creater = ProjectCreater(
-        Project,
-        PythonProject,
-        FlaskProject,
-    )
+    project_creater = ProjectCreater(Project, PythonProject, FlaskProject,)
 
-    project_creater.create(
-        directory=directory,
-        _type=_type,
-        args=given_args
-    )
+    project_creater.create(directory=directory, _type=_type, args=given_args)

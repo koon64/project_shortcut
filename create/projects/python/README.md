@@ -1,6 +1,12 @@
 # Python Project API
 Use this to build python projects
 
+### Arguments
+
+#### Format
+
+For consistant readable code, we recommend you use a formatter. By default the format is `black`(https://github.com/psf/black)
+
 ### Methods
 
 #### get_args()
