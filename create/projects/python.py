@@ -10,15 +10,12 @@ class PythonProject(Project):
     def get_args(cls):
         return {
             **super().get_args(),
-            **{
-                'python_version': 3.7
-            }
         }
 
     @classmethod
     def get_packages(cls):
         return [
-            'requests'
+            'requests==2.24.0'
         ]
 
     @classmethod
@@ -49,39 +46,12 @@ class PythonProject(Project):
         cls.run_command("python -m venv ./venv")
 
     @classmethod
-    def in_venv(cls):
-        result = cls.run_command("pip -V", return_output=True)
-        return '\\venv\\lib' not in result or '/venv/lib' not in result
-
-    @classmethod
-    def deactivate_current_venv(cls):
-        if not cls.in_venv():
-            return
-
-        if sys.platform == "win32":
-            print('wahte hte fic')
-            cls.run_command("venv\\Scripts\\deactivate")
-            return
-        
-        cls.run_command("deactivate")
-
-    @classmethod
-    def activate_venv(cls):
-        cls.deactivate_current_venv()
-
-        cls.run_command("pip freeze")
-
-        exit()
-
-        if sys.platform == "win32":
-            cls.run_command("venv\\Scripts\\activate")
-            return
-        
-        cls.run_command("source venv/Scripts/activate")
-
-    @classmethod
     def create_requirements(cls):
-        cls.run_command("pip freeze > requirements.txt")
+        packages = cls.get_packages()
+        packages_file_content = "\n".join(packages)
+        with open("requirements.txt", "w") as f:
+            f.write(packages_file_content)
+            f.close()
 
     @classmethod
     def run_commands(cls, **kwargs):
@@ -90,14 +60,10 @@ class PythonProject(Project):
         # create venv
         cls.create_venv()
 
-        # activate
-        cls.activate_venv()
-
-        # install requirements
-        cls.install_packages()
-
         # create requirements
         cls.create_requirements()
+
+
 
         pass
 
