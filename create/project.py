@@ -1,4 +1,5 @@
 import os
+import pathlib
 
 
 class Project:
@@ -11,6 +12,40 @@ class Project:
         if not return_output:
             return os.system(cmd)
         return os.popen(cmd).read()
+
+    @classmethod
+    def get_project_path(cls):
+        return f'{str(pathlib.Path(__file__).parent.absolute())}/projects/{cls.TYPE}/'
+
+    @classmethod
+    def get_template(cls, file_name):
+        if not os.path.exists(f'{cls.get_project_path()}/{file_name}.template'):
+            raise Exception(f'The {file_name} template does not exist')
+        with open(f'{cls.get_project_path()}/{file_name}.template') as file:
+            template = file.read()
+            file.close()
+            return template
+
+    @classmethod
+    def get_formatted_template(cls, file_name, **kwargs):
+        return cls.get_template(file_name).format(**kwargs)
+
+    @classmethod
+    def create_file_from_template(
+            cls,
+            file_name,
+            template=None,
+            **kwargs
+        ):
+        # set the template to the file name if not exists
+        if not template:
+            template = file_name
+        
+        file_content = cls.get_formatted_template(template.split('/').pop(), **kwargs)
+        with open(file_name, "w") as file:
+            file.write(file_content)
+            file.close()
+        return True
 
     @classmethod
     def get_args(cls):

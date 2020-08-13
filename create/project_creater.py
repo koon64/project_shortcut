@@ -115,6 +115,7 @@ class ProjectCreater:
             'directory': directory,
             'project_name': project_name,
             'display_name': display_name,
+            'class_name': display_name.replace(' ', ''),
             'github_access_token': os.environ.get('GITHUB_ACCESS_TOKEN'),
             'author': os.environ.get('AUTHOR'),
             'year': now.year,

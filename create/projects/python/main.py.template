@@ -1,0 +1,9 @@
+# main.py - main python program
+from {project_name} import {class_name}
+
+
+def main():
+    pass
+
+if __name__ == "__main__":
+    main()
