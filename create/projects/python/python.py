@@ -7,29 +7,67 @@ class PythonProject(Project):
 
     TYPE = "python"
 
+    PYTHON_FORMAT_MAP = {
+        'black': {
+            'package': 'black==19.10b0',
+            'shield': {
+                'img': 'https://camo.githubusercontent.com/28a51fe3a2c05048d8ca8ecd039d6b1619037326/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f636f64652532307374796c652d626c61636b2d3030303030302e737667',
+                'txt': 'Format',
+                'url': 'https://github.com/psf/black'
+            }
+        }
+    }
+
     @classmethod
     def get_args(cls):
         return {
             **super().get_args(),
+            **{
+                'formatter': 'black'
+            }
         }
 
     @classmethod
-    def get_packages(cls):
-        return [
+    def get_packages(cls, **kwargs):
+        packages = [
             'requests==2.24.0',
             'pytest==6.0.1'
         ]
+        formatter = kwargs.get('formatter')
+        if not formatter:
+            return packages
+        # get the formatter package
+        formatter_package = cls.PYTHON_FORMAT_MAP.get(formatter)
+        if not formatter_package:
+            print(f'{formatter} formatter badge does not exist')
+        else:
+            packages.append(formatter_package.get('package'))
+        return packages
 
     @classmethod
-    def get_package_command(cls):
-        packages = PythonProject.get_packages()
+    def get_shields(cls, **kwargs):
+        shields = super().get_shields(**kwargs)
+        formatter = kwargs.get('formatter')
+        if not formatter:
+            return shields
+        # get the formatter package
+        formatter_package = cls.PYTHON_FORMAT_MAP.get(formatter)
+        if not formatter_package:
+            print(f'{formatter} formatter does not exist, not using formatter')
+        return shields + [
+            formatter_package.get('shield')
+        ]
+
+    @classmethod
+    def get_package_command(cls, **kwargs):
+        packages = PythonProject.get_packages(**kwargs)
         if not packages:
             return
         return f'pip install {",".join(packages)}'
 
     @classmethod
-    def get_markdown_lines(cls):
-        markdown = super().get_markdown_lines()
+    def get_markdown_lines(cls, **kwargs):
+        markdown = super().get_markdown_lines(**kwargs)
         return markdown + [
             '## Setup',
             '### Install requirements',
@@ -48,8 +86,8 @@ class PythonProject(Project):
         cls.run_command("python -m venv ./venv")
 
     @classmethod
-    def create_requirements(cls):
-        packages = cls.get_packages()
+    def create_requirements(cls, **kwargs):
+        packages = cls.get_packages(**kwargs)
         packages_file_content = "\n".join(packages)
         with open("requirements.txt", "w") as f:
             f.write(packages_file_content)
@@ -133,7 +171,7 @@ class PythonProject(Project):
         cls.create_venv()
 
         # create requirements
-        cls.create_requirements()
+        cls.create_requirements(**kwargs)
 
         # creates the python programs
         cls.create_python_program(**kwargs)

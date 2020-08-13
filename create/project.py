@@ -64,12 +64,12 @@ class Project:
         return []
 
     @classmethod
-    def get_package_command(cls):
+    def get_package_command(cls, **kwargs):
         return ""
 
     @classmethod
-    def install_packages(cls):
-        cmd = cls.get_package_command()
+    def install_packages(cls, **kwargs):
+        cmd = cls.get_package_command(**kwargs)
         if not cmd:
             return
         cls.run_command(
@@ -77,22 +77,29 @@ class Project:
         )
 
     @classmethod
-    def get_markdown_lines(cls):
+    def get_markdown_lines(cls, **kwargs):
         return [
             '# {display_name}',
             '### By {author}',
+            "\n".join(
+                [
+                    f'[![{shield.get("txt")}]({shield.get("img")})]({shield.get("url")})'
+                    for shield in cls.get_shields(**kwargs)
+                ]
+            ),
+            '',
             '{description}',
             '',
             '--'
         ]
 
     @classmethod
-    def get_markdown_format(cls):
-        return "\n".join(cls.get_markdown_lines())
+    def get_markdown_format(cls, **kwargs):
+        return "\n".join(cls.get_markdown_lines(**kwargs))
 
     @classmethod
     def get_markdown(cls, **kwargs):
-        return cls.get_markdown_format().format(**kwargs)
+        return cls.get_markdown_format(**kwargs).format(**kwargs)
 
     @classmethod
     def get_ignored(cls):
@@ -119,8 +126,16 @@ class Project:
         with open('.gitignore', 'w') as file:
             file.write(ignore_content)
             file.close()
-        
-
+    
+    @classmethod
+    def get_shields(cls, **kwargs):
+        return [
+            {
+                'txt': 'License',
+                'img': f'https://img.shields.io/github/license/{kwargs.get("repo_name")}',
+                'url': f'https://github.com/{kwargs.get("repo_name")}',
+            }
+        ]
 
     @classmethod
     def run_init_commands(cls, **kwargs):
@@ -132,8 +147,16 @@ class Project:
         access_token = kwargs.get('github_access_token')
         if not access_token:
             raise Exception('No github access token found')
-        return Github(access_token).get_user().create_repo(
-            name=kwargs.get('project_name'),
+        github = kwargs.get('github')
+        user = kwargs.get('github_user')
+        project_name = kwargs.get('project_name')
+        repo_name = f'{user.login}/{project_name}'
+        repo = github.get_repo(repo_name)
+        if repo:
+            return repo
+        print(f'Creating new repo: {repo_name}')
+        return user.create_repo(
+            name=project_name,
             description=kwargs.get('description'),
             private=not kwargs.get('public'),
         )

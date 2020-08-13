@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 from datetime import datetime
+from github import Github
 from . import (
     LicenseGenerator as lg,
 )
@@ -111,13 +112,21 @@ class ProjectCreater:
         # combine all the args into 1
         # now timestamp
         now = datetime.now()
+        # github profile
+        # access token
+        github_access_token = os.environ.get('GITHUB_ACCESS_TOKEN')
+        github = Github(github_access_token)
+        github_user = github.get_user()
         return {
             'directory': directory,
             'project_name': project_name,
             'display_name': display_name,
             'class_name': display_name.replace(' ', ''),
-            'github_access_token': os.environ.get('GITHUB_ACCESS_TOKEN'),
+            'github_access_token': github_access_token,
             'author': os.environ.get('AUTHOR'),
+            'github': github,
+            'github_user': github_user,
+            'repo_name': f'{github_user.login}/{project_name}',
             'year': now.year,
             'month': now.month
         }
