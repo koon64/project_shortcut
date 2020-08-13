@@ -15,7 +15,15 @@ class PythonProject(Project):
                 "txt": "Format",
                 "url": "https://github.com/psf/black",
             },
-        }
+        },
+        "pep8": {
+            "package": "pep8==1.7.1",
+            "shield": {
+                "img": "https://img.shields.io/badge/Format-PEP8-brightgreen",
+                "txt": "Format",
+                "url": "https://www.python.org/dev/peps/pep-0008/",
+            },
+        },
     }
 
     @classmethod
@@ -148,7 +156,7 @@ class PythonProject(Project):
 
     @classmethod
     def run_init_commands(cls, **kwargs):
-        super().run_init_commands()
+        super().run_init_commands(**kwargs)
 
         # create venv
         cls.create_venv()
