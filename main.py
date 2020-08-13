@@ -5,6 +5,7 @@ from create import (
 )
 from create.projects import (
     PythonProject,
+    FlaskProject,
     # add other projects here
 )
 
@@ -19,6 +20,7 @@ if __name__ == "__main__":
     project_creater = ProjectCreater(
         Project,
         PythonProject,
+        FlaskProject,
     )
 
     project_creater.create(

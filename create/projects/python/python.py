@@ -16,7 +16,8 @@ class PythonProject(Project):
     @classmethod
     def get_packages(cls):
         return [
-            'requests==2.24.0'
+            'requests==2.24.0',
+            'pytest==6.0.1'
         ]
 
     @classmethod
@@ -56,7 +57,7 @@ class PythonProject(Project):
 
     @classmethod
     def create_main(cls, **kwargs):
-        ok = cls.create_file_from_template('main.py', **kwargs)
+        ok = cls.create_file_from_template('python/main.py', **kwargs)
 
     @classmethod
     def create_python_program(cls, **kwargs):
@@ -69,7 +70,7 @@ class PythonProject(Project):
         return [
             {
                 'file': kwargs.get('project_name') + '.py',
-                'template': 'program.py',
+                'template': 'python/program.py',
                 'exports': [
                     kwargs.get('class_name')
                 ]
@@ -125,18 +126,14 @@ class PythonProject(Project):
         return True
 
     @classmethod
-    def run_commands(cls, **kwargs):
-        super().run_commands()
+    def run_init_commands(cls, **kwargs):
+        super().run_init_commands()
 
         # create venv
-        # cls.create_venv()
+        cls.create_venv()
 
         # create requirements
         cls.create_requirements()
 
         # creates the python programs
         cls.create_python_program(**kwargs)
-
-
-        pass
-

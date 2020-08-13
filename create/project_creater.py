@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime
 from . import (
-    LicenseGenerator,
+    LicenseGenerator as lg,
 )
 # load the dotenv
 load_dotenv()
@@ -87,8 +87,8 @@ class ProjectCreater:
             directory
         )
 
-        # create the license
-        ok = LicenseGenerator.create(
+        # create the license from the license generator
+        ok = lg.create(
             **kwargs
         )
         if not ok:
@@ -153,7 +153,7 @@ class ProjectCreater:
         project = self.get_project(_type)
         # test if the project exists
         if not project:
-            print("Project type not found")
+            print(f'{_type} was not a valid project')
             exit(1)
         # get the args
         kwargs = self.get_args(
@@ -173,13 +173,17 @@ class ProjectCreater:
             **kwargs
         )
 
-        # runs ps commands
+        # run the init commands
+        # parent->project
 
-        project.run_commands(
+        project.run_init_commands(
             **kwargs
         )
 
-        # runs non-ps commands
+        # run the closure commands
+        # project->parent
 
-        pass
+        project.run_closure_commands(
+            **kwargs
+        )
 
