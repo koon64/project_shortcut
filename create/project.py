@@ -129,7 +129,7 @@ class Project:
             "SECURITY": "base/SECURITY.md",
             "PULL_REQUEST_TEMPLATE": "base/PULL_REQUEST_TEMPLATE",
             "CODE_OF_CONDUCT": "base/CODE_OF_CONDUCT",
-            "ISSUE_TEMPLATE/BUG.md"
+            "ISSUE_TEMPLATE/BUG.md": "base/BUG",
         }
 
     @classmethod
