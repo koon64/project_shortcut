@@ -90,7 +90,9 @@ class Project:
         return cls.get_template(file_name).format(**kwargs)
 
     @classmethod
-    def create_file_from_template(cls, template: str, file_name: str=None, **kwargs) -> bool:
+    def create_file_from_template(
+        cls, template: str, file_name: str = None, **kwargs
+    ) -> bool:
         """Writes a formatted template to a given path
 
         Arguments
