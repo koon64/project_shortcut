@@ -90,7 +90,9 @@ class PythonProject(Project):
 
     @classmethod
     def create_main(cls, **kwargs):
-        ok = cls.create_file_from_template("python/main.py", **kwargs)
+        ok = cls.create_file_from_template(
+            file_name="main.py", template="python/main.py", **kwargs
+        )
 
     @classmethod
     def create_python_program(cls, **kwargs):
@@ -159,7 +161,7 @@ class PythonProject(Project):
         super().run_init_commands(**kwargs)
 
         # create venv
-        cls.create_venv()
+        # cls.create_venv()
 
         # create requirements
         cls.create_requirements(**kwargs)
