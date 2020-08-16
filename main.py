@@ -68,33 +68,6 @@ if __name__ == "__main__":
         print()
         exit()
 
-        tree = {"base": {}}
-
-        pm = parent_map
-
-        def f(id, t={}):
-            if id not in t:
-                t[id] = {}
-            c = pm.get(id)
-            for ch in c:
-                m = f(ch, t)
-
-                print(m)
-            print(id, c)
-            return t
-
-        f("base")
-
-        """
-        for project in projects:
-            _type = project.TYPE
-            children = parent_map.get(_type)
-            print(_type, children)
-        """
-        print(parent_map)
-
-        exit()
-
     given_args = cmd_args[3:]
 
     project_creater.create(directory=directory, _type=_type, args=given_args)
