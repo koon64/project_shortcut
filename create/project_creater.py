@@ -17,7 +17,14 @@ class ProjectCreater:
         self.projects = projects
 
     @classmethod
-    def get_config(cls):
+    def get_config(cls) -> dict:
+        """Gets the config for projects
+
+        Returns
+        -------
+            dict: Config arguments
+
+        """
         try:
             with open(cls.CONFIG_FILE_NAME) as file:
                 config = load(file, Loader=FullLoader)
