@@ -180,4 +180,4 @@ class ProjectCreater:
         # run the closure commands
         # project->parent
 
-        # project.run_closure_commands(**kwargs)
+        project.run_closure_commands(**kwargs)

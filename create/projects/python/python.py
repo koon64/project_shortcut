@@ -161,7 +161,7 @@ class PythonProject(Project):
         super().run_init_commands(**kwargs)
 
         # create venv
-        # cls.create_venv()
+        cls.create_venv()
 
         # create requirements
         cls.create_requirements(**kwargs)
